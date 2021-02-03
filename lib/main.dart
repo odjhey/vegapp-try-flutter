@@ -133,10 +133,21 @@ class _RandomWordsState extends State<RandomWords> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Startup Name Generator'),
-        actions: [IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)],
+        actions: [
+          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
+          IconButton(icon: Icon(Icons.golf_course), onPressed: _pushLogin)
+        ],
       ),
       body: _buildSuggestions(),
     );
+  }
+
+  void _pushLogin() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return Scaffold(
+          appBar: AppBar(title: Text('Save abc')), body: MyCustomForm());
+    }));
   }
 
   void _pushSaved() {
@@ -196,5 +207,37 @@ class _RandomWordsState extends State<RandomWords> {
         });
       },
     );
+  }
+}
+
+class MyCustomForm extends StatefulWidget {
+  @override
+  _MyCustomFormState createState() => _MyCustomFormState();
+}
+
+class _MyCustomFormState extends State<MyCustomForm> {
+  final _formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            TextFormField(validator: (value) {
+              if (value.isEmpty) {
+                return 'please no empty';
+              }
+              return null;
+            }),
+            ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    Scaffold.of(context).showSnackBar(
+                        SnackBar(content: Text('processing data')));
+                  }
+                },
+                child: Text('save'))
+          ],
+        ));
   }
 }
