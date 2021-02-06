@@ -1,33 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+
+import 'package:vegapp/theme_store.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  final ThemeStore themeStore = ThemeStore();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or simply save your changes to "hot reload" in a Flutter IDE).
-          // Notice that the counter didn't reset back to zero; the application
-          // is not restarted.
-          primaryColor: Colors.orange,
-          // This makes the visual density adapt to the platform that you run
-          // the app on. For desktop platforms, the controls will be smaller and
-          // closer together (more dense) than on mobile platforms.
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: RandomWords());
+    return Observer(builder: (context) {
+      return MaterialApp(
+        title: 'Mobx Theme',
+        theme: themeStore.currentThemeData,
+        home: ThemePage(themeStore: themeStore),
+      );
+    });
   }
 }
 
@@ -239,5 +231,67 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 child: Text('save'))
           ],
         ));
+  }
+}
+
+class MobxThemeApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Mobx Theme',
+        theme: ThemeData(
+            primarySwatch: Colors.deepPurple,
+            visualDensity: VisualDensity.adaptivePlatformDensity),
+        home: MyHomePage());
+  }
+}
+
+class ThemePage extends StatelessWidget {
+  final ThemeStore themeStore;
+  const ThemePage({Key key, this.themeStore}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Mobx themee'), actions: <Widget>[
+        IconButton(
+            icon: Icon(Icons.brightness_medium),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  child: Observer(
+                      builder: (_) => SimpleDialog(
+                              title: Text('Select theme'),
+                              children: <Widget>[
+                                ListTile(
+                                  title: const Text('Light Theme'),
+                                  leading: Radio(
+                                    value: ThemeType.light,
+                                    groupValue: themeStore.currentThemeType,
+                                    onChanged: (ThemeType value) {
+                                      themeStore.changeCurrentTheme(value);
+                                      print(value);
+                                    },
+                                  ),
+                                ),
+                                ListTile(
+                                  title: const Text('Dark Theme'),
+                                  leading: Radio(
+                                    value: ThemeType.dark,
+                                    groupValue: themeStore.currentThemeType,
+                                    onChanged: (ThemeType value) {
+                                      themeStore.changeCurrentTheme(value);
+                                    },
+                                  ),
+                                )
+                              ])));
+            })
+      ]),
+      body: Center(
+        child: Card(
+          child: ListTile(title: Text('The current theme is : ')),
+        ),
+      ),
+    );
   }
 }
