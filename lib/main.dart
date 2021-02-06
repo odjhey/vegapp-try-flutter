@@ -3,21 +3,23 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 import 'package:vegapp/theme_store.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MultiProvider(
+      providers: [Provider<ThemeStore>(create: (_) => ThemeStore())],
+      child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  final ThemeStore themeStore = ThemeStore();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
       return MaterialApp(
         title: 'Mobx Theme',
-        theme: themeStore.currentThemeData,
-        home: ThemePage(themeStore: themeStore),
+        theme: context.watch<ThemeStore>().currentThemeData,
+        home: ThemePage(),
       );
     });
   }
@@ -247,44 +249,43 @@ class MobxThemeApp extends StatelessWidget {
 }
 
 class ThemePage extends StatelessWidget {
-  final ThemeStore themeStore;
-  const ThemePage({Key key, this.themeStore}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Mobx themee'), actions: <Widget>[
+      appBar: AppBar(title: Text('Mobx themerz'), actions: <Widget>[
         IconButton(
             icon: Icon(Icons.brightness_medium),
             onPressed: () {
               showDialog(
                   context: context,
-                  child: Observer(
-                      builder: (_) => SimpleDialog(
-                              title: Text('Select theme'),
-                              children: <Widget>[
-                                ListTile(
-                                  title: const Text('Light Theme'),
-                                  leading: Radio(
-                                    value: ThemeType.light,
-                                    groupValue: themeStore.currentThemeType,
-                                    onChanged: (ThemeType value) {
-                                      themeStore.changeCurrentTheme(value);
-                                      print(value);
-                                    },
-                                  ),
-                                ),
-                                ListTile(
-                                  title: const Text('Dark Theme'),
-                                  leading: Radio(
-                                    value: ThemeType.dark,
-                                    groupValue: themeStore.currentThemeType,
-                                    onChanged: (ThemeType value) {
-                                      themeStore.changeCurrentTheme(value);
-                                    },
-                                  ),
-                                )
-                              ])));
+                  child: Observer(builder: (_) {
+                    final themeStore = context.read<ThemeStore>();
+                    return SimpleDialog(
+                        title: Text('Select theme'),
+                        children: <Widget>[
+                          ListTile(
+                            title: const Text('Light Theme'),
+                            leading: Radio(
+                              value: ThemeType.light,
+                              groupValue: themeStore.currentThemeType,
+                              onChanged: (ThemeType value) {
+                                themeStore.changeCurrentTheme(value);
+                                print(value);
+                              },
+                            ),
+                          ),
+                          ListTile(
+                            title: const Text('Dark Theme'),
+                            leading: Radio(
+                              value: ThemeType.dark,
+                              groupValue: themeStore.currentThemeType,
+                              onChanged: (ThemeType value) {
+                                themeStore.changeCurrentTheme(value);
+                              },
+                            ),
+                          )
+                        ]);
+                  }));
             })
       ]),
       body: Center(
