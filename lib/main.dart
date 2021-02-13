@@ -258,39 +258,46 @@ class ThemePage extends StatelessWidget {
             onPressed: () {
               showDialog(
                   context: context,
-                  child: Observer(builder: (_) {
-                    final themeStore = context.read<ThemeStore>();
-                    return SimpleDialog(
-                        title: Text('Select theme'),
-                        children: <Widget>[
-                          ListTile(
-                            title: const Text('Light Theme'),
-                            leading: Radio(
-                              value: ThemeType.light,
-                              groupValue: themeStore.currentThemeType,
-                              onChanged: (ThemeType value) {
-                                themeStore.changeCurrentTheme(value);
-                                print(value);
-                              },
-                            ),
-                          ),
-                          ListTile(
-                            title: const Text('Dark Theme'),
-                            leading: Radio(
-                              value: ThemeType.dark,
-                              groupValue: themeStore.currentThemeType,
-                              onChanged: (ThemeType value) {
-                                themeStore.changeCurrentTheme(value);
-                              },
-                            ),
-                          )
-                        ]);
-                  }));
+                  builder: (_) => Observer(builder: (_) {
+                        final themeStore = context.read<ThemeStore>();
+                        return SimpleDialog(
+                            title: Text('Select theme'),
+                            children: <Widget>[
+                              ListTile(
+                                title: const Text('Light Theme'),
+                                leading: Radio(
+                                  value: ThemeType.light,
+                                  groupValue: themeStore.currentThemeType,
+                                  onChanged: (ThemeType value) {
+                                    themeStore.changeCurrentTheme(value);
+                                    print(value);
+                                  },
+                                ),
+                              ),
+                              ListTile(
+                                title: const Text('Dark Theme'),
+                                leading: Radio(
+                                  value: ThemeType.dark,
+                                  groupValue: themeStore.currentThemeType,
+                                  onChanged: (ThemeType value) {
+                                    themeStore.changeCurrentTheme(value);
+                                  },
+                                ),
+                              )
+                            ]);
+                      }));
             })
       ]),
       body: Center(
-        child: Card(
-          child: ListTile(title: Text('The current theme is : ')),
+        child: Column(
+          children: <Widget>[
+            Card(child: Observer(builder: (context) {
+              return ListTile(
+                title: Text(
+                    'The current theme is : ${context.watch<ThemeStore>().themeString}'),
+              );
+            })),
+          ],
         ),
       ),
     );
